@@ -17,28 +17,29 @@ impl<T, const N: usize> RingBuffer<T, N> {
     }
 
     pub fn push(&mut self, item: T) -> Option<T> {
-        let mut ret= None;
-
-        if self.len == N {
-            ret = self.data[self.head].take();
+        let overwritten = if self.len == N {
+            let old = self.data[self.head].take();
             self.head = (self.head + 1) % N;
+            old
         }
         else {
             self.len += 1;
-        }
+            None
+        };
 
         self.data[self.tail] = Some(item);
         self.tail = (self.tail + 1) % N;
-        ret
+        overwritten
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        let mut ret = None;
-        if self.len != 0 {
-            ret = self.data[self.head].take();
-            self.head = (self.head + 1) % N;
-            self.len -= 1;
+        if self.len == 0 {
+            return None;
         }
+
+        let ret = self.data[self.head].take();
+        self.head = (self.head + 1) % N;
+        self.len -= 1;
         ret
     }
 
@@ -46,7 +47,7 @@ impl<T, const N: usize> RingBuffer<T, N> {
         self.len
     }
 
-    pub fn is_emtpy(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len == 0
     }
 }
@@ -65,7 +66,7 @@ pub fn test_task1_1() {
     // Buffer is now full [1, 6, 7]. Pushing 40 overwrites oldest (10).
     assert_eq!(buf.push(40), Some(10));
 
-    assert_eq!(buf.is_emtpy(), false);
+    assert_eq!(buf.is_empty(), false);
     assert_eq!(buf.len(), BUFF_SIZE);
 
     // Pop remaining elements in FIFO order
@@ -74,7 +75,7 @@ pub fn test_task1_1() {
     assert_eq!(buf.pop(), Some(40));
     assert_eq!(buf.pop(), None); // Empty again
 
-    assert_eq!(buf.is_emtpy(), true);
+    assert_eq!(buf.is_empty(), true);
 
     println!("✅ RingBuffer passed all checks!");
 }
