@@ -1,0 +1,33 @@
+{
+    "name": "Devcontainer",
+    // "image": "",
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "tamasfe.even-better-toml",
+                "vadimcn.vscode-lldb",
+                "fill-labs.dependi"
+            ]
+        }
+    },
+    "mounts":[
+        // "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+        "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly",
+        "source=${localEnv:HOME}/.gitconfig,target=/home/vscode//.gitconfig,type=bind,readonly",
+        // "source=/dev,target=/dev,type=bind",
+    ],
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+    },
+    "runArgs": [
+        "--network=host",
+        "--cap-add=SYS_TIME",
+    ],
+    "initializeCommand": "",
+    "postCreateCommand": ".devcontainer/setup_devcontainer.sh",
+}
