@@ -1,18 +1,7 @@
-fn process_telemetry(readings: Vec<f64>) {
-    let sum: f64 = readings.iter().sum();
-    println!("Sum: {sum}");
-}
-
-fn process_borrowed(readings: &[f64]) {
-    let sum: f64 = readings.iter().sum();
-    println!("Sum: {sum}");
-}
+include!("start.rs");
+include!("task1.1/task.rs");
 
 fn main() {
-    let data = vec![1.0, 2.0, 3.0];
-
-    process_borrowed(&data);
-    println!("{:?}", data);
-    process_telemetry(data);
-    // println!("{:?}", data);
+    test_start();
+    test_task1_1();
 }
