@@ -1,5 +1,4 @@
 
-
 struct RingBuffer<T, const N: usize> {
     data: [Option<T>; N],
     head: usize,
@@ -63,13 +62,13 @@ pub fn test_task1_1() {
     assert_eq!(buf.push(20), None);
     assert_eq!(buf.push(30), None);
 
-    // // Buffer is now full [1, 6, 7]. Pushing 40 overwrites oldest (10).
+    // Buffer is now full [1, 6, 7]. Pushing 40 overwrites oldest (10).
     assert_eq!(buf.push(40), Some(10));
 
     assert_eq!(buf.is_emtpy(), false);
     assert_eq!(buf.len(), BUFF_SIZE);
 
-    // // Pop remaining elements in FIFO order
+    // Pop remaining elements in FIFO order
     assert_eq!(buf.pop(), Some(20));
     assert_eq!(buf.pop(), Some(30));
     assert_eq!(buf.pop(), Some(40));
