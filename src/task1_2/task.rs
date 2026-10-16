@@ -1,4 +1,3 @@
-// The Code here
 #[derive(Debug, Clone, PartialEq)]
 pub enum SystemState {
     Uninitialized,
@@ -131,6 +130,15 @@ pub fn test_task1_2() {
     assert_eq!(
         robot.handle_event(SystemEvent::Reset),
         Ok(SystemState::Uninitialized)
+    );
+
+    robot.state = SystemState::Navigating {
+        target_x: 10.0,
+        target_y: 10.0,
+    };
+    assert_eq!(
+        robot.handle_event(SystemEvent::ReachTarget),
+        Result::Ok(SystemState::Ready)
     );
 
     println!("✅ State Machine passed all checks!");
