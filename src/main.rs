@@ -1,9 +1,9 @@
 mod start;
-mod task1_1;
-mod task1_2;
+mod tasks;
+mod rust_doc;
 
 fn main() {
     start::test_start();
-    task1_1::test_task1_1();
-    task1_2::test_task1_2();
+    tasks::run_tasks();
+    rust_doc::run_tasks();
 }
