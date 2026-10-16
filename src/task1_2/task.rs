@@ -33,66 +33,47 @@ impl RobotStateMachine {
 
 impl StateTransition for RobotStateMachine {
     fn handle_event(&mut self, event: SystemEvent) -> Result<SystemState, String> {
-        match &self.state {
-            SystemState::Uninitialized => {
-                self.state = match event {
-                    SystemEvent::Initialize => SystemState::Ready,
-                    _ => return Err("Cannot execute: Robot is Uninitialized.".to_string()),
-                };
-
-                return Ok(SystemState::Ready);
+        let next_state = match (&self.state, &event) {
+            (SystemState::Uninitialized, SystemEvent::Initialize) => {
+                SystemState::Ready
             }
-            SystemState::Ready => match event {
-                SystemEvent::StartNavigation { x, y } => {
-                    self.state = SystemState::Navigating {
-                        target_x: x,
-                        target_y: y,
-                    };
-                    return Ok(self.state.clone());
+            (SystemState::Ready, SystemEvent::StartNavigation { x, y }) => {
+                SystemState::Navigating {
+                    target_x: *x,
+                    target_y: *y,
                 }
-                SystemEvent::TriggerFault(msg) => {
-                    self.state = SystemState::Failed(msg);
-                    return Ok(self.state.clone());
-                }
-                _ => return Err("Invalid event for Ready state.".to_string()),
-            },
-            SystemState::Navigating {
-                target_x: _,
-                target_y: _,
-            } => match event {
-                SystemEvent::ReachTarget => {
-                    self.state = SystemState::Ready;
-                    return Ok(SystemState::Ready);
-                }
-                SystemEvent::StartNavigation { x, y } => {
-                    self.state = SystemState::Navigating {
-                        target_x: x,
-                        target_y: y,
-                    };
-                    return Ok(self.state.clone());
-                }
-                SystemEvent::TriggerFault(msg) => {
-                    self.state = SystemState::Failed(msg);
-                    return Ok(self.state.clone());
-                }
-                _ => {
-                    return Err("Invalid event for Navigating state.".to_string());
-                }
-            },
-            SystemState::Failed(reason) => match event {
-                SystemEvent::Reset => {
-                    self.state = SystemState::Uninitialized;
-                    return Ok(SystemState::Uninitialized);
-                }
-                _ => {
-                    return Err(format!(
-                        "Robot is in Failed state ({reason}). Must Reset first."
-                    ));
-                }
-            },
-        }
+            }
+            (SystemState::Ready, SystemEvent::TriggerFault(msg)) => {
+                SystemState::Failed(msg.to_string())
+            }
+            (SystemState::Ready, _) => {
+                return Err("Invalid event for Ready state.".to_string());
+            }
+            (SystemState::Navigating { .. }, SystemEvent::ReachTarget) => {
+                SystemState::Ready
+            }
+            (SystemState::Navigating { .. }, SystemEvent::StartNavigation { x, y }) => {
+                SystemState::Navigating { target_x: *x, target_y: *y }
+            }
+            (SystemState::Navigating { .. }, SystemEvent::TriggerFault(msg)) => {
+                SystemState::Failed(msg.to_string())
+            }
+            (SystemState::Navigating { .. }, _) => {
+                return Err("Invalid event for Navigating state.".to_string());
+            }
+            (SystemState::Failed(..), SystemEvent::Reset) => {
+                SystemState::Uninitialized
+            }
+            (SystemState::Failed(reason), _) => {
+                return Err(format!("Robot is in Failed state ({reason}). Must Reset first."));
+            }
+            (_, _) => {
+                return Err("Cannot execute: Robot is Uninitialized.".to_string());
+            }
+        };
 
-        // Err("Cannot execute: Robot is Uninitialized.".to_string())
+        self.state = next_state;
+        Ok(self.state.clone())
     }
 }
 
@@ -138,7 +119,7 @@ pub fn test_task1_2() {
     };
     assert_eq!(
         robot.handle_event(SystemEvent::ReachTarget),
-        Result::Ok(SystemState::Ready)
+        Ok(SystemState::Ready)
     );
 
     println!("✅ State Machine passed all checks!");
