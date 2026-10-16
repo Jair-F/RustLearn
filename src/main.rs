@@ -1,6 +1,6 @@
+mod rust_doc;
 mod start;
 mod tasks;
-mod rust_doc;
 
 fn main() {
     start::test_start();
