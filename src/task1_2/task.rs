@@ -34,9 +34,7 @@ impl RobotStateMachine {
 impl StateTransition for RobotStateMachine {
     fn handle_event(&mut self, event: SystemEvent) -> Result<SystemState, String> {
         let next_state = match (&self.state, &event) {
-            (SystemState::Uninitialized, SystemEvent::Initialize) => {
-                SystemState::Ready
-            }
+            (SystemState::Uninitialized, SystemEvent::Initialize) => SystemState::Ready,
             (SystemState::Ready, SystemEvent::StartNavigation { x, y }) => {
                 SystemState::Navigating {
                     target_x: *x,
@@ -49,11 +47,12 @@ impl StateTransition for RobotStateMachine {
             (SystemState::Ready, _) => {
                 return Err("Invalid event for Ready state.".to_string());
             }
-            (SystemState::Navigating { .. }, SystemEvent::ReachTarget) => {
-                SystemState::Ready
-            }
+            (SystemState::Navigating { .. }, SystemEvent::ReachTarget) => SystemState::Ready,
             (SystemState::Navigating { .. }, SystemEvent::StartNavigation { x, y }) => {
-                SystemState::Navigating { target_x: *x, target_y: *y }
+                SystemState::Navigating {
+                    target_x: *x,
+                    target_y: *y,
+                }
             }
             (SystemState::Navigating { .. }, SystemEvent::TriggerFault(msg)) => {
                 SystemState::Failed(msg.to_string())
@@ -61,11 +60,11 @@ impl StateTransition for RobotStateMachine {
             (SystemState::Navigating { .. }, _) => {
                 return Err("Invalid event for Navigating state.".to_string());
             }
-            (SystemState::Failed(..), SystemEvent::Reset) => {
-                SystemState::Uninitialized
-            }
+            (SystemState::Failed(..), SystemEvent::Reset) => SystemState::Uninitialized,
             (SystemState::Failed(reason), _) => {
-                return Err(format!("Robot is in Failed state ({reason}). Must Reset first."));
+                return Err(format!(
+                    "Robot is in Failed state ({reason}). Must Reset first."
+                ));
             }
             (_, _) => {
                 return Err("Cannot execute: Robot is Uninitialized.".to_string());
