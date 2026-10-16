@@ -1,4 +1,3 @@
-
 fn process_telemetry(readings: Vec<f64>) {
     let sum: f64 = readings.iter().sum();
     println!("Sum: {sum}");

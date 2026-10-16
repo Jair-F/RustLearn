@@ -1,4 +1,3 @@
-
 struct RingBuffer<T, const N: usize> {
     data: [Option<T>; N],
     head: usize,
@@ -9,7 +8,7 @@ struct RingBuffer<T, const N: usize> {
 impl<T, const N: usize> RingBuffer<T, N> {
     pub fn new() -> Self {
         Self {
-            data: [const {None}; N],
+            data: [const { None }; N],
             head: 0,
             tail: 0,
             len: 0,
@@ -21,8 +20,7 @@ impl<T, const N: usize> RingBuffer<T, N> {
             let old = self.data[self.head].take();
             self.head = (self.head + 1) % N;
             old
-        }
-        else {
+        } else {
             self.len += 1;
             None
         };
@@ -54,7 +52,7 @@ impl<T, const N: usize> RingBuffer<T, N> {
 
 pub fn test_task1_1() {
     // Create a stack-allocated ring buffer for integers with capacity 3
-    const BUFF_SIZE:usize = 3;
+    const BUFF_SIZE: usize = 3;
     let mut buf: RingBuffer<i32, BUFF_SIZE> = RingBuffer::new();
 
     assert_eq!(buf.pop(), None);
